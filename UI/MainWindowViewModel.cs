@@ -19,6 +19,12 @@ namespace EchoBridge.UI
         private ObservableCollection<DeviceInfo> _availableDevices;
 
         [ObservableProperty]
+        private ObservableCollection<CaptureDeviceInfo> _availableInputDevices;
+
+        [ObservableProperty]
+        private CaptureDeviceInfo? _selectedInputDevice;
+
+        [ObservableProperty]
         private string _statusMessage;
 
         [ObservableProperty]
@@ -29,12 +35,14 @@ namespace EchoBridge.UI
             _audioRouter = new AudioRouter();
             _outputDevices = new ObservableCollection<OutputDeviceViewModel>();
             _availableDevices = new ObservableCollection<DeviceInfo>();
+            _availableInputDevices = new ObservableCollection<CaptureDeviceInfo>();
             _statusMessage = "Ready";
 
             _audioRouter.StatusChanged += OnRouterStatusChanged;
             _audioRouter.ErrorOccurred += OnRouterError;
 
             LoadAvailableDevices();
+            LoadAvailableInputDevices();
         }
 
         private void LoadAvailableDevices()
@@ -51,6 +59,27 @@ namespace EchoBridge.UI
             catch (Exception ex)
             {
                 StatusMessage = $"Error loading devices: {ex.Message}";
+            }
+        }
+
+        private void LoadAvailableInputDevices()
+        {
+            try
+            {
+                var devices = LoopbackCapture.GetCaptureDevices();
+                AvailableInputDevices.Clear();
+                foreach (var device in devices)
+                {
+                    AvailableInputDevices.Add(device);
+                    if (device.IsDefault)
+                    {
+                        SelectedInputDevice = device;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error loading input devices: {ex.Message}";
             }
         }
 
@@ -111,9 +140,15 @@ namespace EchoBridge.UI
                     return;
                 }
 
-                _audioRouter.Start();
+                if (SelectedInputDevice == null)
+                {
+                    StatusMessage = "Please select an input device";
+                    return;
+                }
+
+                _audioRouter.Start(SelectedInputDevice.Id);
                 IsRouting = true;
-                StatusMessage = "Audio routing started";
+                StatusMessage = $"Audio routing started from: {SelectedInputDevice.FriendlyName}";
             }
             catch (Exception ex)
             {
@@ -141,7 +176,8 @@ namespace EchoBridge.UI
         private void RefreshDevices()
         {
             LoadAvailableDevices();
-            StatusMessage = "Device list refreshed";
+            LoadAvailableInputDevices();
+            StatusMessage = "Device lists refreshed";
         }
 
         private void OnRouterStatusChanged(object? sender, string message)

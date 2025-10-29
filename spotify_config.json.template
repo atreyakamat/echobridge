@@ -1,5 +1,5 @@
 {
-  "client_id": "0d04965b3de2426394addccdbbe870aa",
-  "client_secret": "4cdc1335c37a43ba9cea36575c3c7776",
+  "client_id": "YOUR_SPOTIFY_CLIENT_ID_HERE",
+  "client_secret": "YOUR_SPOTIFY_CLIENT_SECRET_HERE",
   "redirect_uri": "http://localhost:5000/callback"
 }

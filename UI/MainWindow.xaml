@@ -11,6 +11,10 @@
         Background="{StaticResource DarkBackgroundBrush}"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
+
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
@@ -63,7 +67,36 @@
             <!-- Output Devices Panel -->
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <TextBlock Text="OUTPUT DEVICES" Style="{StaticResource SubHeaderText}"/>
+                    <!-- INPUT DEVICE SELECTION -->
+                    <TextBlock Text="INPUT DEVICE" Style="{StaticResource SubHeaderText}"/>
+                    <Border Style="{StaticResource GlassCard}">
+                        <StackPanel>
+                            <TextBlock Text="Select Audio Source to Capture" 
+                                       Style="{StaticResource BodyText}" Margin="0,0,0,12"/>
+                            <ComboBox ItemsSource="{Binding AvailableInputDevices}"
+                                      SelectedItem="{Binding SelectedInputDevice}"
+                                      DisplayMemberPath="FriendlyName"
+                                      FontSize="14"
+                                      Padding="12,8"
+                                      Background="{StaticResource CardBackgroundBrush}"
+                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                      BorderBrush="{StaticResource BorderBrush}">
+                                <ComboBox.ItemContainerStyle>
+                                    <Style TargetType="ComboBoxItem">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+                                        <Setter Property="Padding" Value="12,8"/>
+                                    </Style>
+                                </ComboBox.ItemContainerStyle>
+                            </ComboBox>
+                            <TextBlock Text="{Binding SelectedInputDevice.FriendlyName, StringFormat='Selected: {0}'}" 
+                                       Style="{StaticResource BodyText}" 
+                                       Foreground="{StaticResource AccentNeonBrush}"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="OUTPUT DEVICES" Style="{StaticResource SubHeaderText}" Margin="0,16,0,0"/>
 
                     <ItemsControl ItemsSource="{Binding OutputDevices}">
                         <ItemsControl.ItemTemplate>
@@ -262,8 +295,4 @@
             </Grid>
         </Border>
     </Grid>
-
-    <Window.Resources>
-        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-    </Window.Resources>
 </Window>

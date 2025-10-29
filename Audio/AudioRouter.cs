@@ -68,7 +68,7 @@ namespace EchoBridge.Audio
             }
         }
 
-        public void Start()
+        public void Start(string? inputDeviceId = null)
         {
             if (_isRunning)
                 return;
@@ -82,9 +82,13 @@ namespace EchoBridge.Audio
                 _capture = new LoopbackCapture();
                 _capture.DataAvailable += OnAudioDataAvailable;
                 _capture.RecordingStopped += OnRecordingStopped;
+                _capture.StartRecording(inputDeviceId);
+
+                // Wait a moment for capture to initialize
+                System.Threading.Thread.Sleep(100);
 
                 // Initialize all output devices with the capture format
-                var format = _capture.WaveFormat ?? throw new InvalidOperationException("Failed to get wave format");
+                var format = _capture.WaveFormat ?? throw new InvalidOperationException("Failed to get wave format from input device");
                 
                 foreach (var device in _devices)
                 {
@@ -92,8 +96,6 @@ namespace EchoBridge.Audio
                     device.Play();
                 }
 
-                // Start capturing
-                _capture.StartRecording();
                 _isRunning = true;
                 StatusChanged?.Invoke(this, "Audio routing started");
             }

@@ -12,7 +12,6 @@ namespace EchoBridge.Services
 
         public bool IsAuthenticated => _isAuthenticated;
 
-        public event EventHandler<CurrentlyPlaying>? NowPlayingChanged;
         public event EventHandler<string>? ConnectionStatusChanged;
 
         public SpotifyService()
